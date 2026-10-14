@@ -40,3 +40,10 @@ Route::middleware(['auth'])->group(function () {
     // Eksplorasi Jurusan
     Route::get('/majors', [MajorController::class, 'index'])->name('majors.index');
 });
+
+use App\Http\Controllers\ProfileController;
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
+});

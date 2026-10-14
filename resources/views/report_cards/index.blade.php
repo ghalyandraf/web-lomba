@@ -66,13 +66,6 @@
     <h2 class="page-title">Nilai Rapor</h2>
     <p class="page-sub">Masukkan nilai rapor untuk membantu kami memahami kekuatan akademikmu.</p>
 
-    <nav class="card stepper" aria-label="Langkah">
-        <div class="step active" aria-current="step"><span class="step-num">1</span> Nilai rapor</div>
-        <div class="step"><span class="step-num">2</span> Pilih jurusan</div>
-        <div class="step"><span class="step-num">3</span> Analisis</div>
-        <div class="step"><span class="step-num">4</span> Rencana karier</div>
-    </nav>
-
     @if (session('success'))
         <div class="alert alert-ok">{{ session('success') }}</div>
     @endif
