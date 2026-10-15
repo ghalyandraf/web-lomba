@@ -29,7 +29,7 @@
         </div>
 
         <!-- Dynamic Preview Card Berdasarkan Data Rapor / Analisis Asli -->
-        <div class="relative flex justify-center">
+        <div class="relative flex justify-center">        
             <div class="w-full max-w-md p-8 rounded-3xl bg-navyLight/70 border border-white/15 backdrop-blur-xl glow-effect relative space-y-6 shadow-2xl">
                 <div class="absolute -top-6 -right-6 w-24 h-24 bg-gold/20 rounded-full blur-2xl"></div>
                 <div class="text-center space-y-2">

@@ -35,12 +35,16 @@
     <nav class="fixed top-0 left-0 right-0 z-50 bg-navy/90 backdrop-blur-md border-b border-white/15">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-goldDark flex items-center justify-center glow-effect">
-                    <i class="fa-solid fa-fire text-navy text-xl"></i>
+                <div class="w-10 h-10 flex items-center justify-center overflow-hidden">
+                    <img
+                        src="{{ asset('images/logo-lantera.png') }}"
+                        alt="Logo Lentera"
+                        class="w-full h-full object-contain"
+                    >
                 </div>
                 <span class="text-2xl font-extrabold tracking-tight text-white">Lentera<span class="text-gold">.</span></span>
             </div>
-            
+
             <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-300">
                 <a href="#fitur" class="hover:text-gold transition">Cara Kerja</a>
                 <a href="{{ route('login') }}" class="hover:text-gold transition">Input Rapor</a>
@@ -59,8 +63,12 @@
     <footer class="bg-[#070D1F] border-t border-white/10 py-12 px-6">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
             <div class="flex items-center space-x-3 mb-4 md:mb-0">
-                <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center">
-                    <i class="fa-solid fa-fire text-navy text-sm"></i>
+                <div class="w-8 h-8 flex items-center justify-center overflow-hidden">
+                    <img
+                        src="{{ asset('images/logo-lantera.png') }}"
+                        alt="Logo Lentera"
+                        class="w-full h-full object-contain"
+                    >
                 </div>
                 <span class="text-lg font-bold text-white">Lentera<span class="text-gold">.</span></span>
             </div>

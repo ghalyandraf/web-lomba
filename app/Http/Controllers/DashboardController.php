@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Major;
+use App\Services\MajorRecommendationService;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
-    {
+    public function index(
+        Request $request,
+        MajorRecommendationService $recommendationService
+    ) {
         $user = Auth::user();
 
         $latestReportCard = $user->reportCards()->latest()->first();
@@ -21,10 +24,28 @@ class DashboardController extends Controller
 
         $majors = Major::all();
 
-        $selectedMajor = null;
+        $selectedMajor = $user->major()->first();
 
-        if ($request->filled('major_id')) {
+        if (!$selectedMajor && $request->filled('major_id')) {
             $selectedMajor = Major::find($request->integer('major_id'));
+        }
+
+        $selectedMajorMatchScore = null;
+
+        if ($latestReportCard && $selectedMajor) {
+            $recommendations = $recommendationService->recommend(
+                $latestReportCard
+            );
+
+            $selectedRecommendation = $recommendations->firstWhere(
+                'id',
+                $selectedMajor->id
+            );
+
+            if ($selectedRecommendation) {
+                $selectedMajorMatchScore =
+                    $selectedRecommendation->match_score;
+            }
         }
 
         return view('dashboard.index', compact(
@@ -32,7 +53,8 @@ class DashboardController extends Controller
             'latestReportCard',
             'latestAnalysis',
             'majors',
-            'selectedMajor'
+            'selectedMajor',
+            'selectedMajorMatchScore'
         ));
     }
 }

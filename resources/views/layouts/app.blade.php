@@ -26,7 +26,18 @@
         /* Sidebar */
         .sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px 16px; display: flex; flex-direction: column; position: sticky; top: 24px; height: calc(100vh - 48px); }
         .brand { display: flex; align-items: center; gap: 12px; padding: 0 4px; }
-        .brand-logo { width: 38px; height: 38px; border-radius: 10px; background: var(--navy); flex-shrink: 0; }
+        .brand-logo {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
         .brand-name { font-size: 18px; font-weight: 700; color: var(--navy); letter-spacing: .02em; line-height: 1.1; }
         .brand-tag { font-size: 8px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
         .menu-label { font-size: 10px; font-weight: 600; color: var(--muted); margin: 26px 4px 10px; letter-spacing: .04em; text-transform: uppercase; }
@@ -101,7 +112,9 @@
 <div class="app">
     <aside class="sidebar">
         <div class="brand">
-            <div class="brand-logo"></div>
+            <div class="brand-logo">
+                <img src="{{ asset('images/logo-lantera.png') }}" alt="Logo LANTERA">
+            </div>
             <div>
                 <div class="brand-name">LANTERA</div>
                 <div class="brand-tag">Terangkan masa depan</div>
