@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportCardController;
 use App\Http\Controllers\DiamondController;
 use App\Http\Controllers\MajorController;
+use App\Http\Controllers\CareerController;
 
 // Halaman awal: selalu logout dulu, lalu tampilkan halaman login
 Route::get('/', function (Request $request) {
@@ -25,7 +26,7 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Rute yang Memerlukan Login (Akses Dashboard, Rapor, & Diamond)
+// Rute yang Memerlukan Login (Akses Dashboard, Rapor, Diamond, Jurusan, & Karier)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -40,6 +41,15 @@ Route::middleware(['auth'])->group(function () {
     // Eksplorasi Jurusan
     Route::get('/majors', [MajorController::class, 'index'])->name('majors.index');
 });
+
+    
+    // Rencana Karier
+    Route::get('/career-plans', [CareerController::class, 'index'])
+        ->name('career.index');
+
+    Route::post('/career-plans', [CareerController::class, 'store'])
+        ->name('career.store');
+
 
 use App\Http\Controllers\ProfileController;
 

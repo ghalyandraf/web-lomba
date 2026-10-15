@@ -117,7 +117,7 @@
             <li><a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Beranda</a></li>
             <li><a href="{{ route('report-cards.index') }}" class="{{ request()->routeIs('report-cards.*') ? 'active' : '' }}">Nilai Rapor</a></li>
             <li><a href="{{ route('majors.index') }}" class="{{ request()->routeIs('majors.*') ? 'active' : '' }}">Eksplorasi Jurusan</a></li>
-            <li><a href="#">Rencana Karier</a></li>
+           <li><a href="{{ route('career.index') }}">Rencana Karier</a></li>
         </ul>
 
         {{-- Tombol keluar (paling bawah sidebar) --}}
