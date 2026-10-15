@@ -9,7 +9,14 @@ class Major extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'min_scores', 'required_skills'];
+    protected $fillable = [
+        'name',
+        'field',
+        'slug',
+        'description',
+        'min_scores',
+        'required_skills',
+    ];
 
     protected $casts = [
         'min_scores' => 'array',
@@ -19,5 +26,10 @@ class Major extends Model
     public function analysisResults()
     {
         return $this->hasMany(AnalysisResult::class);
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
     }
 }

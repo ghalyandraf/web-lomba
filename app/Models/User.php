@@ -14,6 +14,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'major_id',
     ];
 
     protected $hidden = [
@@ -27,6 +28,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function major()
+    {
+        return $this->belongsTo(Major::class);
     }
 
     public function reportCards()

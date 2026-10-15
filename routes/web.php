@@ -9,6 +9,7 @@ use App\Http\Controllers\ReportCardController;
 use App\Http\Controllers\DiamondController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\CareerController;
+use App\Http\Controllers\ProfileController;
 
 // Halaman awal: selalu logout dulu, lalu tampilkan halaman login
 Route::get('/', function (Request $request) {
@@ -19,14 +20,14 @@ Route::get('/', function (Request $request) {
     return redirect()->route('login');
 });
 
-// Autentikasi Routes
+// Autentikasi Routes (tanpa login)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Rute yang Memerlukan Login (Akses Dashboard, Rapor, Diamond, Jurusan, & Karier)
+// WAJIB LOGIN: Dashboard, Rapor, Diamond, Jurusan, Karier, Profil
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -38,22 +39,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/diamond', [DiamondController::class, 'index'])->name('diamond.index');
     Route::post('/diamond/analyze', [DiamondController::class, 'analyze'])->name('diamond.analyze');
 
-    // Eksplorasi Jurusan
+   // Eksplorasi Jurusan
     Route::get('/majors', [MajorController::class, 'index'])->name('majors.index');
-});
+    Route::get('/majors/{slug}', [MajorController::class, 'show'])->name('majors.show');
+    Route::post('/majors/{major}/select', [MajorController::class, 'select'])->name('majors.select');
 
-    
     // Rencana Karier
-    Route::get('/career-plans', [CareerController::class, 'index'])
-        ->name('career.index');
+    Route::get('/career-plans', [CareerController::class, 'index'])->name('career.index');
+    Route::post('/career-plans', [CareerController::class, 'store'])->name('career.store');
 
-    Route::post('/career-plans', [CareerController::class, 'store'])
-        ->name('career.store');
-
-
-use App\Http\Controllers\ProfileController;
-
-Route::middleware('auth')->group(function () {
+    // Profil
     Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
 });
