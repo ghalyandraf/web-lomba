@@ -40,6 +40,17 @@
         margin: 0;
     }
 
+    .dash .d-alert {
+        padding: 14px 18px;
+        margin-bottom: 18px;
+        border-radius: 14px;
+        background: #e8f8f1;
+        border: 1px solid #bfe9d6;
+        color: #0b7a53;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
     /* ============ Tombol ============ */
     .dash .d-btn {
         display: inline-flex;
@@ -312,6 +323,87 @@
         transition: width .5s ease;
     }
 
+    /* ============ Jurusan paling cocok (dari nilai rapor) ============ */
+    .dash .match-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+    .dash .match-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+    }
+    .dash .match-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+        padding: 20px;
+        background: #fff;
+        border: 1px solid var(--d-line);
+        border-radius: var(--d-radius);
+        box-shadow: var(--d-shadow);
+    }
+    .dash .match-card.first {
+        background: linear-gradient(135deg, var(--d-navy) 0%, #17407f 100%);
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 16px 34px rgba(15, 42, 82, .25);
+    }
+    .dash .match-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .dash .match-rank {
+        display: grid; place-items: center;
+        min-width: 28px; height: 28px; padding: 0 8px;
+        border-radius: 9px;
+        background: var(--d-primary-soft);
+        color: var(--d-primary);
+        font-size: 12px; font-weight: 800;
+    }
+    .dash .match-card.first .match-rank { background: #f5c451; color: #3a2a00; }
+    .dash .match-badge {
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--lv) 14%, #fff);
+        color: var(--lv);
+        font-size: 11px; font-weight: 800;
+        white-space: nowrap;
+    }
+    .dash .match-card.first .match-badge { background: rgba(255, 255, 255, .18); color: #fff; }
+    .dash .match-name {
+        font-size: clamp(16px, 2vw, 19px);
+        font-weight: 800;
+        color: var(--d-navy);
+        line-height: 1.3;
+        overflow-wrap: anywhere;
+    }
+    .dash .match-card.first .match-name { color: #fff; }
+    .dash .match-pct { font-size: 32px; font-weight: 800; color: var(--lv); line-height: 1; }
+    .dash .match-pct small { font-size: 15px; }
+    .dash .match-card.first .match-pct { color: #fff; }
+    .dash .match-bar { height: 8px; border-radius: 999px; background: var(--d-line); overflow: hidden; }
+    .dash .match-bar > div { height: 100%; border-radius: 999px; background: var(--lv); }
+    .dash .match-card.first .match-bar { background: rgba(255, 255, 255, .18); }
+    .dash .match-card.first .match-bar > div { background: #fff; }
+    .dash .match-note { font-size: 12px; line-height: 1.6; color: var(--d-muted); margin: 0; }
+    .dash .match-card.first .match-note { color: rgba(255, 255, 255, .8); }
+    .dash .match-empty {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        flex-wrap: wrap;
+        padding: clamp(20px, 3vw, 28px);
+        background: linear-gradient(135deg, #fff 0%, var(--d-primary-soft) 100%);
+        border: 1px dashed var(--d-sky);
+        border-radius: var(--d-radius);
+    }
+    .dash .match-empty h3 { margin: 0 0 6px; font-size: 17px; font-weight: 700; color: var(--d-navy); }
+    .dash .match-empty p { margin: 0; font-size: 13px; line-height: 1.7; color: var(--d-muted); max-width: 520px; }
+
     /* ============ Rekomendasi ============ */
     .dash .reco {
         display: grid;
@@ -377,18 +469,23 @@
     @media (max-width: 1024px) {
         .dash .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .dash .journey .j-card:last-child { grid-column: 1 / -1; }
+        .dash .match-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .dash .match-card.first { grid-column: 1 / -1; }
     }
     @media (max-width: 760px) {
         .dash .hero { border-radius: 20px; }
         .dash .journey,
         .dash .reco,
+        .dash .match-grid,
         .dash .detail-grid { grid-template-columns: minmax(0, 1fr); }
-        .dash .journey .j-card:last-child { grid-column: auto; }
+        .dash .journey .j-card:last-child,
+        .dash .match-card.first { grid-column: auto; }
         .dash .section-head { margin-top: 28px; }
     }
     @media (max-width: 480px) {
         .dash .hero .d-btn,
         .dash .detail-actions .d-btn,
+        .dash .match-empty .d-btn,
         .dash .reco-main .d-btn { width: 100%; }
         .dash .j-card { padding: 16px; }
         .dash .detail-block { padding: 14px; }
@@ -404,6 +501,8 @@
 
 @section('content')
 @php
+    use App\Services\MajorMatcher;
+
     // Nilai rapor terbaru
     $kartuTerakhir = auth()->user()->reportCards()->latest()->first();
 
@@ -413,7 +512,7 @@
             : (json_decode($kartuTerakhir->scores, true) ?? []))
         : [];
 
-    $semuaNilai = collect($skorTerakhir)->values();
+    $semuaNilai = collect($skorTerakhir)->filter(fn ($v) => is_numeric($v))->values();
     $jumlahNilai = $semuaNilai->count();
     $rataRapor = $jumlahNilai > 0 ? $semuaNilai->avg() : null;
 
@@ -422,9 +521,36 @@
 
     $jurusanPilihan = $jurusanPilihan ?? null;
     $rencanaKarier = $rencanaKarier ?? ($rencanaTerakhir->target_career ?? null);
+    $selectedMajor = $selectedMajor ?? null;
+
+    // ===== Rekomendasi jurusan dari nilai rapor (rumus sama dengan halaman Nilai Rapor) =====
+    $ranking = collect();
+    if ($kartuTerakhir && $jumlahNilai > 0) {
+        $ranking = app(MajorMatcher::class)->rank(
+            $skorTerakhir,
+            $kartuTerakhir->interests ?? '',
+            $kartuTerakhir->skills ?? ''
+        );
+    }
+    $top3 = $ranking->take(3);
+
+    // Kecocokan jurusan yang dipilih user (pakai rumus yang sama; fallback ke nilai dari controller)
+    $matchPilihan = null;
+    if ($selectedMajor) {
+        $row = $ranking->firstWhere('id', $selectedMajor->id);
+        if ($row) {
+            $matchPilihan = (int) round($row['pct']);
+        } elseif (isset($selectedMajorMatchScore) && $selectedMajorMatchScore !== null) {
+            $matchPilihan = (int) $selectedMajorMatchScore;
+        }
+    }
 @endphp
 
 <div class="dash">
+
+    @if (session('success'))
+        <div class="d-alert">{{ session('success') }}</div>
+    @endif
 
     <section class="hero">
         <span class="hero-chip"><i></i> Langkah pertamamu dimulai di sini</span>
@@ -437,7 +563,7 @@
     </section>
 
     {{-- DETAIL JURUSAN YANG DIPILIH --}}
-    @if(isset($selectedMajor) && $selectedMajor)
+    @if($selectedMajor)
         <section class="major-detail">
             <div class="eyebrow">DETAIL JURUSAN PILIHANMU</div>
 
@@ -526,39 +652,42 @@
                 <span class="j-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
                 </span>
-                <span class="j-label">Jurusan pilihan</span>
+                <span class="j-label">{{ $selectedMajor ? 'Jurusan pilihan' : ($top3->isNotEmpty() ? 'Jurusan teratas' : 'Jurusan pilihan') }}</span>
             </div>
 
-            <div class="j-value" id="dashboardMajorName">
-                {{ isset($selectedMajor) && $selectedMajor
-                    ? $selectedMajor->name
-                    : ($jurusanPilihan ?? 'Belum dipilih') }}
-            </div>
+            @if ($selectedMajor)
+                <div class="j-value" id="dashboardMajorName">{{ $selectedMajor->name }}</div>
 
-            @if(isset($selectedMajor) && $selectedMajor)
-                @if(isset($selectedMajorMatchScore) && $selectedMajorMatchScore !== null)
+                @if ($matchPilihan !== null)
                     <div class="meter">
                         <div class="meter-row">
-                            <span>Kecocokan estimasi</span>
-                            <strong>{{ $selectedMajorMatchScore }}%</strong>
+                            <span>Kecocokan dengan nilaimu</span>
+                            <strong>{{ $matchPilihan }}%</strong>
                         </div>
-                        <div class="meter-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ max(0, min(100, (int) $selectedMajorMatchScore)) }}">
-                            <div style="width: {{ max(0, min(100, (int) $selectedMajorMatchScore)) }}%;"></div>
+                        <div class="meter-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ max(0, min(100, $matchPilihan)) }}">
+                            <div style="width: {{ max(0, min(100, $matchPilihan)) }}%;"></div>
                         </div>
                     </div>
-
-                    <div class="j-hint" id="dashboardMajorHint">
-                        Berdasarkan data rapor, minat, dan keterampilan
-                    </div>
+                    <div class="j-hint" id="dashboardMajorHint">Berdasarkan data rapor, minat, dan keterampilan</div>
                 @else
-                    <div class="j-hint" id="dashboardMajorHint">
-                        Isi data rapor untuk melihat estimasi kecocokan
-                    </div>
+                    <div class="j-hint" id="dashboardMajorHint">Isi data rapor untuk melihat estimasi kecocokan</div>
                 @endif
-            @else
-                <div class="j-hint" id="dashboardMajorHint">
-                    Jelajahi pilihan yang tersedia
+            @elseif ($top3->isNotEmpty())
+                @php $t = $top3->first(); $tp = (int) round($t['pct']); @endphp
+                <div class="j-value" id="dashboardMajorName">{{ $t['name'] }}</div>
+                <div class="meter">
+                    <div class="meter-row">
+                        <span>Paling cocok dengan nilaimu</span>
+                        <strong>{{ $tp }}%</strong>
+                    </div>
+                    <div class="meter-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $tp }}">
+                        <div style="width: {{ $tp }}%;"></div>
+                    </div>
                 </div>
+                <div class="j-hint" id="dashboardMajorHint">Belum memilih jurusan &bull; klik untuk menjelajah</div>
+            @else
+                <div class="j-value" id="dashboardMajorName">{{ $jurusanPilihan ?? 'Belum dipilih' }}</div>
+                <div class="j-hint" id="dashboardMajorHint">Jelajahi pilihan yang tersedia</div>
             @endif
         </a>
 
@@ -590,6 +719,48 @@
             @endif
         </a>
     </section>
+
+    {{-- JURUSAN PALING COCOK (dari nilai rapor) --}}
+    <div class="section-head match-head">
+        <div>
+            <h2 class="section-title">Jurusan paling cocok untukmu</h2>
+            <p class="section-sub">Dihitung dari nilai rapor, minat, dan keahlian yang kamu isi.</p>
+        </div>
+        @if ($top3->isNotEmpty())
+            <a href="{{ route('report-cards.index') }}#rekomendasi" class="d-btn d-btn-outline">Lihat semua jurusan &rarr;</a>
+        @endif
+    </div>
+
+    @if ($top3->isNotEmpty())
+        <section class="match-grid">
+            @foreach ($top3 as $i => $r)
+                @php
+                    $lv  = MajorMatcher::level((float) $r['pct']);
+                    $pct = (int) round($r['pct']);
+                @endphp
+                <article class="match-card {{ $i === 0 ? 'first' : '' }}" style="--lv: {{ $lv['color'] }}">
+                    <div class="match-top">
+                        <span class="match-rank">{{ $i === 0 ? '★ ' : '#' }}{{ $r['rank'] }}</span>
+                        <span class="match-badge">{{ $lv['text'] }}</span>
+                    </div>
+                    <div class="match-name">{{ $r['name'] }}</div>
+                    <div class="match-pct">{{ $pct }}<small>%</small></div>
+                    <div class="match-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $pct }}">
+                        <div style="width: {{ $pct }}%;"></div>
+                    </div>
+                    <p class="match-note">{{ $r['note'] }}</p>
+                </article>
+            @endforeach
+        </section>
+    @else
+        <section class="match-empty">
+            <div>
+                <h3>Rekomendasi jurusan belum tersedia</h3>
+                <p>Isi nilai rapor terlebih dahulu. Setelah itu 3 jurusan yang paling cocok dengan nilaimu otomatis tampil di sini beserta persentase kecocokannya.</p>
+            </div>
+            <a href="{{ route('report-cards.index') }}" class="d-btn d-btn-primary">Isi nilai rapor &rarr;</a>
+        </section>
+    @endif
 
     <div class="section-head">
         <h2 class="section-title">Rekomendasi untukmu</h2>

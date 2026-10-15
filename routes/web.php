@@ -96,3 +96,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profil', [ProfileController::class, 'update'])
         ->name('profile.update');
 });
+
+Route::view('/developer/files', 'developer.files')
+    ->name('developer.files');
