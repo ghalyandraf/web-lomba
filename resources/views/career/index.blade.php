@@ -5,9 +5,7 @@
 @section('judul', 'Rencana Karier')
 @section('subjudul', 'Susun langkah nyata dari bangku sekolah hingga siap terjun ke dunia profesional.')
 
-@section('content')
 @push('styles')
-<style>
   /* =====================================================
      RENCANA KARIER — LANTERA
   ===================================================== */
@@ -29,12 +27,8 @@
   @keyframes rkUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   @keyframes rkGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
   @keyframes rkDrop{from{opacity:0;transform:translateY(-10px) scale(.99)}to{opacity:1;transform:none}}
+  @keyframes rkPop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
   .rk-in{animation:rkUp .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0s)}
-
-  /* ---------- Alert ---------- */
-  .alert{display:flex;align-items:flex-start;gap:10px;background:var(--ok-soft);border:1px solid var(--ok-line);color:var(--ok);border-radius:14px;padding:14px 18px;font-size:12.5px;font-weight:500;margin-bottom:20px;box-shadow:0 2px 8px rgba(30,126,79,.06)}
-  .alert .ic{margin-top:2px}
-  .alert.err{background:var(--err-soft);border-color:var(--err-line);color:var(--err);box-shadow:0 2px 8px rgba(192,57,43,.06)}
 
   /* ---------- Statistik ---------- */
   .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:34px}
@@ -67,8 +61,17 @@
   .btn-main:hover{background:var(--navy-darker);box-shadow:0 10px 22px rgba(31,95,174,.32)}
   .btn-ghost{padding:13px 20px;background:transparent;color:var(--muted);border:1px solid var(--border)!important}
   .btn-ghost:hover{background:var(--bg);color:var(--navy)}
+  .btn-danger{padding:13px 22px;background:var(--err);color:#fff;box-shadow:0 8px 18px rgba(192,57,43,.25)}
+  .btn-danger:hover{background:#a53125}
   #toggleForm{padding:11px 18px;background:var(--sky-soft);color:var(--navy-deep)}
   #toggleForm:hover{background:var(--navy-deep);color:#fff}
+
+  /* tombol kecil di kartu rencana */
+  .btn-sm{padding:8px 14px;font-size:12px;border-radius:10px}
+  .btn-edit{background:var(--sky-soft);color:var(--navy-deep)}
+  .btn-edit:hover{background:var(--navy-deep);color:#fff}
+  .btn-del{background:var(--err-soft);color:var(--err)}
+  .btn-del:hover{background:var(--err);color:#fff}
 
   /* ---------- Form ---------- */
   .form-card{
@@ -163,7 +166,7 @@
 
   /* timeline 3 tahap */
   .timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  .tl{position:relative;background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--tc);border-radius:14px;padding:16px 16px 18px;font-size:12.5px;line-height:1.65;color:var(--text);overflow-wrap:anywhere;transition:background .2s,box-shadow .2s}
+  .tl{position:relative;background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--tc);border-radius:14px;padding:16px 16px 18px;font-size:12.5px;line-height:1.65;color:var(--text);overflow-wrap:anywhere;white-space:pre-line;transition:background .2s,box-shadow .2s}
   .tl:hover{background:#fff;box-shadow:var(--shadow-sm)}
   .tl.s1{--tc:var(--c1)}.tl.s2{--tc:var(--c2)}.tl.s3{--tc:var(--c3)}
   .tl:not(:last-child)::after{
@@ -172,7 +175,9 @@
   }
   .tl-head{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--navy);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em}
 
-  .plan-date{display:flex;align-items:center;gap:6px;margin-top:18px;font-size:11px;color:var(--muted);font-weight:500}
+  .plan-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+  .plan-date{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-weight:500}
+  .plan-actions{display:flex;gap:8px}
 
   /* ---------- Kondisi kosong ---------- */
   .empty{position:relative;overflow:hidden;background:var(--surface);border:2px dashed #cfe0f1;border-radius:22px;padding:56px 24px;text-align:center}
@@ -182,6 +187,38 @@
   @keyframes rkFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
   .empty b{display:block;font-size:18px;color:var(--navy);margin-bottom:8px}
   .empty p{font-size:13px;color:var(--muted);max-width:400px;margin:0 auto 22px;line-height:1.65}
+
+  /* ---------- Popup (edit & hapus) ---------- */
+    dialog.rk-modal{
+    border:0;padding:0;background:transparent;color:inherit;
+    width:min(760px,calc(100vw - 28px));max-height:calc(100vh - 28px);overflow:visible;
+    position:fixed;inset:0;margin:auto;
+  }
+  dialog.rk-modal.sm{width:min(440px,calc(100vw - 28px))}
+  dialog.rk-modal::backdrop{background:rgba(15,42,82,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+  dialog.rk-modal[open]{animation:rkPop .25s cubic-bezier(.2,.7,.2,1)}
+  .modal-card{
+    position:relative;background:var(--surface);border-radius:22px;overflow:hidden;
+    max-height:calc(100vh - 28px);overflow-y:auto;
+    padding:28px 28px 24px;box-shadow:0 30px 70px rgba(15,42,82,.35);
+  }
+  .modal-card::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3))}
+  .modal-card.danger::before{background:linear-gradient(90deg,#e57368,var(--err))}
+  .modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:20px}
+  .modal-head h3{font-size:18px;font-weight:700;color:var(--navy);letter-spacing:-.01em}
+  .modal-head p{font-size:12px;color:var(--muted);margin-top:3px}
+  .modal-x{width:34px;height:34px;border:0;border-radius:10px;background:var(--bg);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex-shrink:0;transition:background .15s,color .15s}
+  .modal-x:hover{background:var(--navy-deep);color:#fff}
+  .modal-err{background:var(--err-soft);border:1px solid var(--err-line);color:var(--err);border-radius:12px;padding:11px 14px;font-size:12px;margin-bottom:18px}
+  .modal-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:6px;padding-top:20px;border-top:1px solid var(--border)}
+
+  .del-body{text-align:center;padding-top:4px}
+  .del-ico{width:64px;height:64px;border-radius:20px;background:var(--err-soft);color:var(--err);display:grid;place-items:center;margin:0 auto 16px}
+  .del-ico .ic{width:28px;height:28px}
+  .del-body h3{font-size:18px;color:var(--navy);margin-bottom:8px}
+  .del-body p{font-size:13px;line-height:1.7;color:var(--muted)}
+  .del-body p b{color:var(--navy);overflow-wrap:anywhere}
+  .del-actions{display:flex;gap:12px;justify-content:center;margin-top:24px}
 
   /* ---------- Responsive ---------- */
   @media (max-width:960px){
@@ -195,20 +232,24 @@
     .plan{padding:20px 18px 20px 22px}
     .plan-head{flex-direction:column;align-items:flex-start}
     .plan-side{width:100%;justify-content:space-between}
+    .plan-foot{flex-direction:column;align-items:stretch}
+    .plan-actions .btn{flex:1}
     .head-row{flex-wrap:wrap}
     .range-scale{padding-right:0}
     .range-row{flex-wrap:wrap}
     .rk .range-row input[type=range]{flex-basis:100%}
-    .form-actions{flex-direction:column-reverse;align-items:stretch}
+    .form-actions,.modal-actions{flex-direction:column-reverse;align-items:stretch}
     .form-hint{margin:6px 0 0;text-align:center}
-    .form-actions .btn{width:100%}
+    .form-actions .btn,.modal-actions .btn,.del-actions .btn{width:100%}
+    .del-actions{flex-direction:column-reverse}
+    .modal-card{padding:24px 18px 20px}
   }
   @media (prefers-reduced-motion:reduce){
     .rk *,.rk *::before,.rk *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   }
-</style>
 @endpush
 
+@section('content')
 <!-- ===== KUMPULAN IKON SVG ===== -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
@@ -222,6 +263,10 @@
   <symbol id="i-layers" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
   <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
   <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
 </svg>
 
 @php
@@ -230,17 +275,28 @@
   $tercapai = $careerPlans->filter(fn ($p) => (int) $p->progress_percentage >= 100)->count();
   $rataRata = $jumlah ? (int) round($careerPlans->avg('progress_percentage')) : 0;
   $nilaiAwal = (int) old('progress_percentage', 0);
-  $formTerbuka = $jumlah === 0 || $errors->any();
+
+  // Popup edit dibuka lagi otomatis kalau validasi update gagal
+  $updateErrors = $errors->getBag('update');
+  $editId = $updateErrors->any() ? old('edit_id') : null;
+
+  $formTerbuka = ($jumlah === 0 || $errors->any()) && ! $editId;
+
+  // Data semua rencana untuk mengisi popup edit
+  $plansJs = $careerPlans->mapWithKeys(fn ($p) => [$p->id => [
+      'target_career'       => $p->target_career,
+      'education_path'      => $p->education_path,
+      'short_term_goals'    => $p->short_term_goals,
+      'medium_term_goals'   => $p->medium_term_goals,
+      'long_term_goals'     => $p->long_term_goals,
+      'progress_percentage' => (int) $p->progress_percentage,
+  ]]);
 @endphp
 
 <div class="rk">
 
-  @if(session('success'))
-    <div class="alert rk-in"><svg class="ic"><use href="#i-check"/></svg> <span>{{ session('success') }}</span></div>
-  @endif
-  @if($errors->any())
-    <div class="alert err rk-in"><span>Periksa kembali isian formulir: {{ $errors->first() }}</span></div>
-  @endif
+  {{-- Notifikasi di tengah layar (sukses / error). Error popup Edit tetap tampil di dalam popup. --}}
+  @include('partials.notif', ['skipErrors' => (bool) $editId])
 
   <!-- RINGKASAN -->
   <div class="stats">
@@ -270,7 +326,7 @@
     </div>
   </div>
 
-  <!-- FORM -->
+  <!-- FORM BARU -->
   <div class="head-row rk-in" style="--d:.2s">
     <div>
       <h3>Buat Rencana Baru</h3>
@@ -291,11 +347,11 @@
         <div class="grid2">
           <div>
             <label for="target_career">Target karier masa depan</label>
-            <input id="target_career" type="text" name="target_career" value="{{ old('target_career') }}" placeholder="Contoh: Web Developer / Software Engineer" required>
+            <input id="target_career" type="text" name="target_career" value="{{ $editId ? '' : old('target_career') }}" placeholder="Contoh: Web Developer / Software Engineer" required>
           </div>
           <div>
             <label for="education_path">Jalur pendidikan</label>
-            <input id="education_path" type="text" name="education_path" value="{{ old('education_path') }}" placeholder="Contoh: S1 Informatika / Bootcamp Profesional" required>
+            <input id="education_path" type="text" name="education_path" value="{{ $editId ? '' : old('education_path') }}" placeholder="Contoh: S1 Informatika / Bootcamp Profesional" required>
           </div>
         </div>
       </div>
@@ -305,15 +361,15 @@
         <div class="grid3">
           <div>
             <label class="step-label" for="short_term_goals"><span class="dot d1">1</span> Jangka pendek</label>
-            <textarea id="short_term_goals" name="short_term_goals" placeholder="Contoh: Menguasai dasar HTML, CSS, dan Algoritma" required>{{ old('short_term_goals') }}</textarea>
+            <textarea id="short_term_goals" name="short_term_goals" placeholder="Contoh: Menguasai dasar HTML, CSS, dan Algoritma" required>{{ $editId ? '' : old('short_term_goals') }}</textarea>
           </div>
           <div>
             <label class="step-label" for="medium_term_goals"><span class="dot d2">2</span> Jangka menengah</label>
-            <textarea id="medium_term_goals" name="medium_term_goals" placeholder="Contoh: Membuat portofolio project web & ikut magang" required>{{ old('medium_term_goals') }}</textarea>
+            <textarea id="medium_term_goals" name="medium_term_goals" placeholder="Contoh: Membuat portofolio project web & ikut magang" required>{{ $editId ? '' : old('medium_term_goals') }}</textarea>
           </div>
           <div>
             <label class="step-label" for="long_term_goals"><span class="dot d3">3</span> Jangka panjang</label>
-            <textarea id="long_term_goals" name="long_term_goals" placeholder="Contoh: Bekerja sebagai Senior Developer di perusahaan teknologi" required>{{ old('long_term_goals') }}</textarea>
+            <textarea id="long_term_goals" name="long_term_goals" placeholder="Contoh: Bekerja sebagai Senior Developer di perusahaan teknologi" required>{{ $editId ? '' : old('long_term_goals') }}</textarea>
           </div>
         </div>
       </div>
@@ -322,8 +378,8 @@
         <div class="fs-title"><span class="num"><svg class="ic"><use href="#i-trend"/></svg></span> Progress</div>
         <label for="numProg">Progress saat ini (%)</label>
         <div class="range-row">
-          <input type="range" id="rangeProg" min="0" max="100" value="{{ $nilaiAwal }}" aria-label="Geser untuk mengatur progress">
-          <input type="number" id="numProg" name="progress_percentage" min="0" max="100" value="{{ $nilaiAwal }}" required>
+          <input type="range" id="rangeProg" min="0" max="100" value="{{ $editId ? 0 : $nilaiAwal }}" aria-label="Geser untuk mengatur progress">
+          <input type="number" id="numProg" name="progress_percentage" min="0" max="100" value="{{ $editId ? 0 : $nilaiAwal }}" required>
         </div>
         <div class="range-scale"><span>0%</span><span>50%</span><span>100%</span></div>
       </div>
@@ -342,7 +398,7 @@
   <div class="head-row rk-in" style="--d:.25s">
     <div>
       <h3>Rencana Karier Aktif</h3>
-      <p>Pantau langkahmu dari jangka pendek sampai jangka panjang.</p>
+      <p>Pantau langkahmu dari jangka pendek sampai jangka panjang. Kamu bisa mengubah atau menghapus rencana kapan saja.</p>
     </div>
   </div>
 
@@ -390,9 +446,22 @@
         </div>
       </div>
 
-      @if($cp->created_at)
-        <div class="plan-date"><svg class="ic sm"><use href="#i-calendar"/></svg> Dibuat {{ $cp->created_at->translatedFormat('d F Y') }}</div>
-      @endif
+      <div class="plan-foot">
+        @if($cp->created_at)
+          <div class="plan-date"><svg class="ic sm"><use href="#i-calendar"/></svg> Dibuat {{ $cp->created_at->translatedFormat('d F Y') }}</div>
+        @else
+          <span></span>
+        @endif
+
+        <div class="plan-actions">
+          <button type="button" class="btn btn-sm btn-edit" data-edit="{{ $cp->id }}">
+            <svg class="ic sm"><use href="#i-edit"/></svg> Edit
+          </button>
+          <button type="button" class="btn btn-sm btn-del" data-del="{{ $cp->id }}" data-name="{{ $cp->target_career }}">
+            <svg class="ic sm"><use href="#i-trash"/></svg> Hapus
+          </button>
+        </div>
+      </div>
     </div>
   @empty
     <div class="empty rk-in" style="--d:.3s">
@@ -405,15 +474,135 @@
     </div>
   @endforelse
 
+  {{-- ============ POPUP EDIT ============ --}}
+  <dialog class="rk-modal" id="editModal" aria-labelledby="editTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h3 id="editTitle">Edit Rencana Karier</h3>
+          <p>Ubah tujuan, tahapan, atau progress rencana ini.</p>
+        </div>
+        <button type="button" class="modal-x" data-close aria-label="Tutup"><svg class="ic"><use href="#i-x"/></svg></button>
+      </div>
+
+      @if($updateErrors->any())
+        <div class="modal-err">Periksa kembali isian: {{ $updateErrors->first() }}</div>
+      @endif
+
+      <form id="editForm" method="POST" action="">
+        @csrf
+        @method('PUT')
+        <input type="hidden" name="edit_id" id="e_id" value="">
+
+        <div class="fs">
+          <div class="fs-title"><span class="num"><svg class="ic"><use href="#i-target"/></svg></span> Tujuan</div>
+          <div class="grid2">
+            <div>
+              <label for="e_target_career">Target karier masa depan</label>
+              <input id="e_target_career" type="text" name="target_career" required>
+            </div>
+            <div>
+              <label for="e_education_path">Jalur pendidikan</label>
+              <input id="e_education_path" type="text" name="education_path" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="fs">
+          <div class="fs-title"><span class="num"><svg class="ic"><use href="#i-steps"/></svg></span> Tahapan</div>
+          <div class="grid3">
+            <div>
+              <label class="step-label" for="e_short_term_goals"><span class="dot d1">1</span> Jangka pendek</label>
+              <textarea id="e_short_term_goals" name="short_term_goals" required></textarea>
+            </div>
+            <div>
+              <label class="step-label" for="e_medium_term_goals"><span class="dot d2">2</span> Jangka menengah</label>
+              <textarea id="e_medium_term_goals" name="medium_term_goals" required></textarea>
+            </div>
+            <div>
+              <label class="step-label" for="e_long_term_goals"><span class="dot d3">3</span> Jangka panjang</label>
+              <textarea id="e_long_term_goals" name="long_term_goals" required></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="fs">
+          <div class="fs-title"><span class="num"><svg class="ic"><use href="#i-trend"/></svg></span> Progress</div>
+          <label for="e_num">Progress saat ini (%)</label>
+          <div class="range-row">
+            <input type="range" id="e_range" min="0" max="100" value="0" aria-label="Geser untuk mengatur progress">
+            <input type="number" id="e_num" name="progress_percentage" min="0" max="100" value="0" required>
+          </div>
+          <div class="range-scale"><span>0%</span><span>50%</span><span>100%</span></div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close>Batal</button>
+          <button type="submit" class="btn btn-main">
+            <svg class="ic"><use href="#i-save"/></svg> Simpan perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  {{-- ============ POPUP HAPUS ============ --}}
+  <dialog class="rk-modal sm" id="delModal" aria-labelledby="delTitle">
+    <div class="modal-card danger">
+      <div class="del-body">
+        <div class="del-ico"><svg class="ic"><use href="#i-alert"/></svg></div>
+        <h3 id="delTitle">Hapus rencana karier?</h3>
+        <p>Rencana <b id="delName">-</b> akan dihapus permanen dan tidak bisa dikembalikan.</p>
+      </div>
+
+      <form id="delForm" method="POST" action="">
+        @csrf
+        @method('DELETE')
+        <div class="del-actions">
+          <button type="button" class="btn btn-ghost" data-close>Batal</button>
+          <button type="submit" class="btn btn-danger">
+            <svg class="ic"><use href="#i-trash"/></svg> Ya, hapus
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
 </div>
 
 <script>
   (function () {
     var $ = function (id) { return document.getElementById(id); };
+
+    var PLANS   = @json($plansJs);
+    var EDIT_ID = @json($editId);
+    var OLD     = @json($editId ? old() : []);
+    var URL_UPDATE = @json(route('career.update', ['careerPlan' => '__ID__']));
+    var URL_DELETE = @json(route('career.destroy', ['careerPlan' => '__ID__']));
+
+    function clamp(v) { v = parseInt(v, 10); return isNaN(v) ? 0 : Math.max(0, Math.min(100, v)); }
+
+    // Slider + angka saling sinkron (dipakai form baru & form edit)
+    function bindProgress(rangeEl, numEl) {
+      function paint(v) { rangeEl.style.setProperty('--v', v + '%'); }
+      rangeEl.addEventListener('input', function () { numEl.value = rangeEl.value; paint(rangeEl.value); });
+      numEl.addEventListener('input', function () {
+        if (numEl.value === '') return;
+        var v = clamp(numEl.value);
+        rangeEl.value = v; paint(v);
+      });
+      numEl.addEventListener('blur', function () {
+        var v = clamp(numEl.value);
+        numEl.value = v; rangeEl.value = v; paint(v);
+      });
+      paint(clamp(rangeEl.value));
+      return paint;
+    }
+
+    // ---------- Form rencana baru ----------
     var formCard = $('formCard');
     var toggleBtn = $('toggleForm');
 
-    // Buka / tutup form
     function setForm(open, focus) {
       formCard.classList.toggle('open', open);
       $('toggleText').textContent = open ? 'Tutup form' : 'Rencana baru';
@@ -435,28 +624,68 @@
     var emptyBtn = $('emptyBtn');
     if (emptyBtn) emptyBtn.addEventListener('click', function () { setForm(true, true); });
 
-    // Tekan Esc untuk menutup form
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && formCard.classList.contains('open')) setForm(false);
+      if (e.key === 'Escape' && formCard.classList.contains('open') && !document.querySelector('dialog[open]')) setForm(false);
     });
 
-    // Slider dan angka progress saling sinkron
-    var range = $('rangeProg'), num = $('numProg');
-    function paint(v) { range.style.setProperty('--v', v + '%'); }
-    function clamp(v) { v = parseInt(v, 10); return isNaN(v) ? 0 : Math.max(0, Math.min(100, v)); }
+    bindProgress($('rangeProg'), $('numProg'));
 
-    range.addEventListener('input', function () { num.value = range.value; paint(range.value); });
-    num.addEventListener('input', function () {
-      if (num.value === '') return;
-      var v = clamp(num.value);
-      range.value = v;
-      paint(v);
+    // ---------- Popup (edit & hapus) ----------
+    var editModal = $('editModal'), delModal = $('delModal');
+    var eRange = $('e_range'), eNum = $('e_num');
+    var paintEdit = bindProgress(eRange, eNum);
+
+    function openModal(m) {
+      if (typeof m.showModal === 'function') m.showModal(); else m.setAttribute('open', '');
+    }
+    function closeModal(m) {
+      if (typeof m.close === 'function') m.close(); else m.removeAttribute('open');
+    }
+
+    [editModal, delModal].forEach(function (m) {
+      // tombol Batal / X
+      m.addEventListener('click', function (e) {
+        if (e.target.closest('[data-close]')) { closeModal(m); return; }
+        // klik area gelap di luar kartu
+        if (e.target === m) closeModal(m);
+      });
     });
-    num.addEventListener('blur', function () {
-      var v = clamp(num.value);
-      num.value = v; range.value = v; paint(v);
+
+    var FIELDS = ['target_career', 'education_path', 'short_term_goals', 'medium_term_goals', 'long_term_goals'];
+
+    function openEdit(id, data) {
+      var p = PLANS[id];
+      if (!p) return;
+      data = data || p;
+
+      $('editForm').setAttribute('action', URL_UPDATE.replace('__ID__', id));
+      $('e_id').value = id;
+
+      FIELDS.forEach(function (f) {
+        $('e_' + f).value = data[f] !== undefined && data[f] !== null ? data[f] : p[f];
+      });
+
+      var v = clamp(data.progress_percentage !== undefined ? data.progress_percentage : p.progress_percentage);
+      eNum.value = v; eRange.value = v; paintEdit(v);
+
+      openModal(editModal);
+    }
+
+    function openDelete(id, name) {
+      $('delForm').setAttribute('action', URL_DELETE.replace('__ID__', id));
+      $('delName').textContent = name || 'ini';
+      openModal(delModal);
+    }
+
+    document.querySelectorAll('[data-edit]').forEach(function (b) {
+      b.addEventListener('click', function () { openEdit(b.getAttribute('data-edit')); });
     });
-    paint(clamp(range.value));
+    document.querySelectorAll('[data-del]').forEach(function (b) {
+      b.addEventListener('click', function () { openDelete(b.getAttribute('data-del'), b.getAttribute('data-name')); });
+    });
+
+    // Validasi update gagal: buka lagi popup dengan isian terakhir
+    if (EDIT_ID && PLANS[EDIT_ID]) openEdit(EDIT_ID, OLD);
   })();
 </script>
 @endsection

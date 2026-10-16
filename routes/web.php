@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Http\Request;
@@ -89,13 +88,22 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/career-plans', [CareerController::class, 'store'])
         ->name('career.store');
 
+    Route::put('/career-plans/{careerPlan}', [CareerController::class, 'update'])
+        ->whereNumber('careerPlan')
+        ->name('career.update');
+
+    Route::delete('/career-plans/{careerPlan}', [CareerController::class, 'destroy'])
+        ->whereNumber('careerPlan')
+        ->name('career.destroy');
+
     // Profil
     Route::get('/profil', [ProfileController::class, 'edit'])
         ->name('profile.edit');
 
     Route::put('/profil', [ProfileController::class, 'update'])
         ->name('profile.update');
-});
 
-Route::view('/developer/files', 'developer.files')
-    ->name('developer.files');
+    // Dokumentasi developer
+    Route::view('/developer/files', 'developer.files')
+        ->name('developer.files');
+});
